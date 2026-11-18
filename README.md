@@ -64,12 +64,12 @@ Compile the paper from `reports/paper/` (`main.tex`, LLNCS class, BibTeX `splncs
 
 ## Spreadsheet values vs. item-level scores
 
-The analysis uses the domain scores of the original database. Two of them differ
-from the item-level computation (`src/analysis.py::SPREADSHEET_OVERRIDES`):
+The analysis uses the domain scores of the original database
+(`src/analysis.py::SPREADSHEET_OVERRIDES`). One of them cannot be computed from
+the items:
 
 | Paper | Evaluator | Domain | Original database | Item-level |
 |---|---|---|---|---|
-| 57 | Gemini | Model description | 0 (hard-coded) | 66.7 |
 | 56 | Claude | Model description | 0 (`#DIV/0!`) | undefined (all items N/A) |
 
 ## Authors

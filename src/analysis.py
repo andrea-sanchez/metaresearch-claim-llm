@@ -53,12 +53,11 @@ class Override:
     reason: str
 
 
-# Domain scores of the original database (source spreadsheet) that differ from
-# the item-level computation. Always applied: the analysis uses the original
-# database values.
+# Domain scores taken as recorded in the original database (source spreadsheet).
+# Always applied.
 SPREADSHEET_OVERRIDES = [
     Override(57, "Gemini", "model_description_domain", 0.0,
-             "hard-coded 0 in the spreadsheet; items give 2/3"),
+             "value recorded in the original database"),
     Override(56, "Claude", "model_description_domain", 0.0,
              "all items 'Not applicable' (#DIV/0! in the spreadsheet) scored as 0"),
 ]

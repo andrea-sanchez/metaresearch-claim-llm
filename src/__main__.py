@@ -20,9 +20,6 @@ IMAGES_DIR = D.ROOT / "reports" / "paper" / "images"
 
 def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s | %(message)s")
-    for o in A.SPREADSHEET_OVERRIDES:
-        log.info("Spreadsheet value: paper %d / %s / %s = %s (%s)",
-                 o.paper_id, o.evaluator, o.outcome, o.value, o.reason)
 
     # 1. Data
     full = D.load_full_dataset()

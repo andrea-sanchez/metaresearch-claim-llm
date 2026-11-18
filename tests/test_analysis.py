@@ -72,7 +72,7 @@ def test_to_percent_half_up():
     assert A.to_percent(s).tolist()[:3] == [58, 13, 29]
 
 
-# --- Original database values ---------------------------------------------
+# --- Original database values (SPREADSHEET_OVERRIDES) ---------------------------------------------
 
 
 def test_spreadsheet_values(scores):

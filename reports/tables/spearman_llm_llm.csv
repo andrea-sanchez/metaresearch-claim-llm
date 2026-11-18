@@ -1,0 +1,16 @@
+outcome,pair,rho,p_value,p_adj,significant
+study_description_domain,ChatGPT vs Claude,0.649697,1.94904e-08,2.92356e-07,True
+study_description_domain,ChatGPT vs Gemini,0.454472,0.000264578,0.00308719,True
+study_description_domain,Claude vs Gemini,0.396785,0.00169663,0.0169663,True
+dataset_description_domain,ChatGPT vs Claude,0.617127,1.51027e-07,2.11437e-06,True
+dataset_description_domain,ChatGPT vs Gemini,0.292394,0.0233889,0.134886,False
+dataset_description_domain,Claude vs Gemini,0.294257,0.022481,0.134886,False
+model_description_domain,ChatGPT vs Claude,0.140775,0.283336,0.566672,False
+model_description_domain,ChatGPT vs Gemini,0.128782,0.326766,0.566672,False
+model_description_domain,Claude vs Gemini,0.334198,0.00906129,0.0815516,False
+performance_domain,ChatGPT vs Claude,0.259048,0.0456489,0.136947,False
+performance_domain,ChatGPT vs Gemini,0.33419,0.00906307,0.0815516,False
+performance_domain,Claude vs Gemini,0.455269,0.000257265,0.00308719,True
+all_domains,ChatGPT vs Claude,0.53959,8.63148e-06,0.000112209,True
+all_domains,ChatGPT vs Gemini,0.304335,0.018071,0.126497,False
+all_domains,Claude vs Gemini,0.27605,0.0327638,0.134886,False

@@ -1,0 +1,9 @@
+\section{Discussion}
+The results reveal important limitations in the use of LLMs to assess CLAIM compliance. Agreement with human assessors was low, with an overall MAE of 21.7-33.1 pp. The models were systematically stricter than humans in all domains except Performance, possibly because they were instructed to rely only on explicitly reported information, whereas humans may accept implicit or partial information. In contrast, Performance showed the opposite pattern, potentially because LLMs considered an item fulfilled once a metric was reported, while humans also evaluated its adequacy. These differences could not be verified at item level.
+
+Furthermore, correlations between LLM and human scores were low ($\rho$ = -0.29 to 0.02), whereas agreement between models was higher (up to $\rho$ = 0.65). This suggests that LLMs may interpret CLAIM differently from human reviewers and rank papers differently, meaning that correcting their systematic bias alone would not ensure agreement. These findings should also be considered in light of the limited range of human scores and the use of a single human assessment team.
+
+Regarding model differences, ChatGPT showed the lowest agreement with human assessors, with the highest MAE in four of five scores. Claude and Gemini showed comparable overall agreement, each performing better in a different domain. This model dependence is consistent with \cite{pluimer-2026}. Unlike \cite{zancanaro-2026}, we did not find LLM scores to be comparable to human assessments, possibly because reproducing item-by-item judgements is more demanding than generating a structured review.
+
+
+

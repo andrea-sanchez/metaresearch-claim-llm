@@ -1,0 +1,16 @@
+outcome,model,n,mae,me,p_value,p_adj,direction,significant
+study_description_domain,ChatGPT,60,34.6,-34.4,3.58405e-11,4.65926e-10,Stricter,True
+study_description_domain,Claude,60,25.3833,-20.8167,1.39249e-07,9.74746e-07,Stricter,True
+study_description_domain,Gemini,60,29.0833,-23.1167,1.43364e-07,9.74746e-07,Stricter,True
+dataset_description_domain,ChatGPT,60,39.7,-39.6,1.78788e-11,2.68182e-10,Stricter,True
+dataset_description_domain,Claude,60,26.9833,-23.9167,4.89403e-09,4.89403e-08,Stricter,True
+dataset_description_domain,Gemini,60,35.15,-28.3833,5.7125e-08,4.57e-07,Stricter,True
+model_description_domain,ChatGPT,60,68.5,-67.8333,6.44476e-11,7.73371e-10,Stricter,True
+model_description_domain,Claude,60,61.9,-57.3667,5.26192e-10,5.78812e-09,Stricter,True
+model_description_domain,Gemini,60,42.4833,-29.5833,1.38153e-05,5.52613e-05,Stricter,True
+performance_domain,ChatGPT,60,20.5167,3.98333,0.21805,0.21805,More lenient,False
+performance_domain,Claude,60,25.3,13.4667,0.000811439,0.00243432,More lenient,True
+performance_domain,Gemini,60,22.2,9.9,0.00484395,0.0096879,More lenient,True
+all_domains,ChatGPT,60,33.1333,-33.1,2.50172e-11,3.50241e-10,Stricter,True
+all_domains,Claude,60,21.7,-18.6333,2.63858e-08,2.37473e-07,Stricter,True
+all_domains,Gemini,60,24.85,-19.3167,2.17946e-07,1.08973e-06,Stricter,True

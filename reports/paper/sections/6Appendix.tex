@@ -1,0 +1,139 @@
+\appendix{}
+\section{Prompt used for LLM CLAIM evaluation}
+\label{app:prompt}
+“Act as an experienced scientific peer reviewer with expertise in artificial intelligence (AI) and medical imaging research. Your task is to critically assess the attached scientific manuscript using the 2020 version of the Checklist for Artificial Intelligence in Medical Imaging (CLAIM). Your assessment must reflect the judgment and rigor of an independent human reviewer.
+
+Every time a new PDF is provided, perform the complete evaluation from the beginning, applying all 42 items of the CLAIM 2020 checklist and following all the instructions below. Treat each PDF as an independent manuscript. Do not use information, assessments, conclusions, or assumptions from previously evaluated PDFs. Do not compare the current manuscript with previously evaluated manuscripts. The evaluation criteria, interpretation of the response categories, and output format must remain exactly the same for every PDF.
+
+Instructions:
+
+1. Assess all 42 items individually and independently. Do not skip, combine, or reorder any items.
+
+2. For each item, assign exactly one of the following answers:
+   - Yes: The manuscript adequately addresses the item. The information provided is sufficiently clear and detailed to satisfy the criterion.
+  - No: The manuscript does not address the item, or the information provided is insufficient, incomplete, unclear, or inadequate to satisfy the criterion.
+   - Not applicable (N/A): The item is genuinely not applicable to the study because of its design, methodology, or research objectives.
+
+3. Use only information explicitly reported in the manuscript. Do not assume that the authors performed a procedure, analysis, validation, or methodological step unless it is described in the paper. Do not fill reporting gaps using common scientific practices, external knowledge, or assumptions about what the authors probably did.
+
+4. Distinguish between missing information and non-applicability. If an item is relevant to the study but the authors fail to report the required information, assign No rather than N/A. Use N/A only when the criterion genuinely does not apply to the particular study.
+
+5. Consider the entire manuscript, including the abstract, introduction, methods, results, discussion, conclusions, tables, figures, figure captions, supplementary materials, and appendices, if provided. Information may be reported in different sections of the paper.
+
+6. Do not evaluate whether the study's scientific conclusions are correct or whether the AI model performs well. Your task is specifically to assess the completeness and quality of reporting according to the CLAIM checklist.
+
+7. Do not provide explanations, justifications, comments, recommendations, summaries, or additional observations in your response.
+
+Output format: Return exactly 43 lines, one for pdf name and one for each checklist item, in the following format:
+
+\begin{enumerate}
+    \item Yes
+    \item No
+    \item Not applicable
+    \setcounter{enumi}{41}
+    
+    \dots
+    
+    \item Yes
+\end{enumerate}
+
+Use the original item numbers from the checklist. Do not include an introduction, heading, conclusion, additional formatting, or any text outside these 42 lines.\\
+
+
+\noindent
+CLAIM 2020 checklist:
+
+Item 1. Indicate the use of the AI techniques—such as “deep learning” or “random forests”—in the article’s title and/or abstract; use judgment regarding the level of specificity.
+
+Item 2. The abstract should present a structured summary of the study’s design, methods, results, and conclusions; it should be understandable without reading the entire manuscript. Provide an overview of the study population (number of patients or examinations, number of images, age and sex distribution). Indicate if the study is prospective or retrospective, and summarize the statistical analysis that was performed. When presenting the results, be sure to include P values for any comparisons. Indicate whether the software, data, and/or resulting model are available publicly.
+
+Item 3. Address an important clinical, scientific, or operational issue. Describe the study’s rationale, goals, and anticipated impact. Summarize related literature and highlight how the investigation builds upon and differs from that work. Guide readers to understand the context for the study, the underlying science, the assumptions underlying the methodology, and the nuances of the study.
+
+Item 4. Define clearly the clinical or scientific question to be answered; avoid vague statements or descriptions of a process. Limit the chance of post hoc data dredging by specifying the study’s hypothesis a priori. Identify a compelling problem to address. The study’s objectives and hypothesis will guide sample size calculations and whether the hypothesis will be supported or not.
+
+Item 5. Indicate if the study is retrospective or prospective. Evaluate predictive models in a prospective setting, if possible.
+
+Item 6. Define the study’s goal, such as model creation, exploratory study, feasibility study, or non inferiority trial. For classification systems, state the intended use, such as diagnosis, screening, staging, monitoring, surveillance, prediction, or prognosis (2). Indicate the proposed role of the AI algorithm relative to other approaches, such as triage, replacement, or add-on (2). Describe the type of predictive modeling to be performed, the target of predictions, and how it will solve the clinical or scientific question.
+
+Item 7. State the source of data and indicate how well the data match the intended use of the model. Describe the targeted application of the predictive model to allow readers to interpret the implications of reported accuracy estimates. Reference any previous studies that used the same dataset and specify how the current study differs. Adhere to ethical guidelines to assure that the study is conducted appropriately; describe the ethics review and informed consent (19). Provide links to data sources and/or images, if available. Authors are strongly encouraged to deposit data and/or software used for modeling or data analysis in a publicly accessible repository.
+
+Item 8. Define how, where, and when potentially eligible participants or studies were identified. Specify inclusion and exclusion criteria such as location, dates, patient-care setting, symptoms, results from previous tests, or registry inclusion. Indicate whether a consecutive, random, or convenience series was selected. Specify the number of patients, studies, reports, and/or images.
+
+Item 9. Preprocessing converts raw data from various sources into a well-defined, machine-readable format for analysis (20,21). Describe preprocessing steps fully and in sufficient detail so that other investigators could reproduce them. Specify the use of normalization, resampling of image size, change in bit depth, and/or adjustment of window/level settings. State whether or not the data have been rescaled, threshold-limited (“binarized”), and/or standardized. Specify how the following issues were handled: regional format, manual input, inconsistent data, missing data, wrong data types, file manipulations, and missing anonymization. Define any criteria to remove outliers (11). Specify the libraries, software (including manufacturer name and location), and version numbers, and all option and configuration settings employed.
+
+Item 10. In some studies, investigators select subsets of the raw extracted data as a preprocessing step, for instance, selecting a subset of the images, cropping down to a portion of an image, or extracting a portion of a report. If this process is automated, describe the tools and parameters used; if done manually, specify the training of the personnel and the criteria they used. Justify how this manual step would be accommodated in the context of the clinical or scientific problem to be solved.
+
+Item 11. Define the predictor and outcome variables. Map them to common data elements, if applicable, such as those maintained by the radiology community (22–24) or the U.S. National Institutes of Health (25,26).
+
+Item 12. Describe the methods by which data have been de-identified and how protected health information has been removed to meet U.S. (HIPAA), European (GDPR), or other relevant laws. Because facial profiles can allow identification, specify the means by which such information has been removed or made unidentifiable (20).
+
+Item 13. State clearly how missing data were handled, such as replacing them with approximate or predicted values. Describe the biases that the imputed data might introduce.
+
+Item 14. Include detailed, specific definitions of the ground truth annotations, ideally referencing common data elements. Avoid vague descriptions such as “size of liver lesion;” use more precise definitions, such as “greatest linear measurement in millimeters passing entirely through the lesion as measured on axial contrast-enhanced CT images of 2.5-mm thickness.” Provide an atlas of examples to annotators to illustrate subjective grading schemes (eg, mild/moderate/severe), and make that information available for review.
+
+Item 15. Describe the rationale for the choice of the reference standard and the potential errors, biases, and limitations of that reference standard.
+
+Item 16. Specify the number of human annotators and their qualifications. Describe the instructions and training given to annotators; include training materials as a supplement, if possible. Describe whether annotations were done independently and how any discrepancies among annotators were resolved.
+
+Item 17. Specify the software used for manual, semi automated, or automated annotation, including the version number. Describe if and how imaging labels were extracted from free-text imaging reports or electronic health records using natural language processing or recurrent neural networks (20,27,28).
+
+Item 18. Describe the methods to measure inter- and intrarater variability, and any steps taken to reduce or mitigate this variability and/or resolve discrepancies.
+
+Item 19. Describe the sample size and how it was determined. Use traditional power calculation methods, if applicable, to estimate the required sample size to allow for generalizability in a larger population and how many cases are needed to show an effect (29).
+
+Item 20. Specify how the data were assigned into training, validation (“tuning”), and testing partitions; indicate the proportion of data in each partition and justify that selection. Indicate if there are any systematic differences between the data in each partition, and if so, why.
+
+Item 21. Describe the level at which the partitions are disjoint. Sets of medical images generally should be disjoint at the patient level or higher so that images of the same patient do not appear in each partition.
+
+Item 22. Provide a complete and detailed structure of the model, including inputs, outputs, and all intermediate layers, in sufficient detail that another investigator could exactly reconstruct the network. For neural network models, include all details of pooling, normalization, regularization, and activation in the layer descriptions. Model inputs must match the form of the preprocessed data. Model outputs must correspond to the requirements of the stated clinical problem, and for supervised learning should match the form of the ground truth annotations. If a previously published model architecture is employed, cite a reference that meets the preceding standards and fully describe every modification made to the model. In some cases, it may be more convenient to provide the structure of the model in code as supplemental data.
+
+Item 23. Specify the names and version numbers of all software libraries, frameworks, and packages. Avoid detailed description of hardware unless benchmarking computational performance is a focus of the work.
+
+Item 24. Indicate how the parameters of the model were initialized. Describe the distribution from which random values were drawn for randomly initialized parameters. Specify the source of the starting weights if transfer learning is employed to initialize parameters. When there is a combination of random initialization and transfer learning, make it clear which portions of the model were initialized with which strategies.
+
+Item 25. Completely describe all of the training procedures and hyperparameters in sufficient detail that another investigator could exactly duplicate the training process. Typically, to fully document training, a manuscript would: Describe how training data were augmented (eg, for images the types and ranges of transformations). State how convergence of training of each model was monitored and what the criteria for stopping training were. Indicate the values that were used for every hyperparameter, which of these were varied between models, over what range, and using what search strategy. For neural networks, descriptions of hyperparameters should include at least learning rate schedule, optimization algorithm, minibatch size, dropout rates (if any), and regularization parameters (if any). Discuss what objective function was employed, why it was selected, and to what extent it matches the performance required for the clinical or scientific use case. Define criteria used to select the best-performing model. If some model parameters are frozen or restricted from modification, as is often the case in transfer learning, clearly indicate which parameters are involved, the method by which they are restricted, and the portion of the training for which the restriction applies. It may be more concise to describe these details in code in the form of a succinct training script, particularly for neural network models when using a standard framework.
+
+Item 26. Describe the method and performance parameters used to select the best-performing model among all the models trained for evaluation against the held-out test set. If more than one model is selected, justify why this is appropriate.
+
+Item 27. If the final algorithm involves an ensemble of models, describe each model comprising the ensemble in complete detail in accordance with the preceding recommendations. Indicate how the outputs of the component models are weighted and/or combined.
+
+Item 28. Describe the metric(s) used to measure the model’s performance and indicate how they address the performance characteristics most important to the clinical or scientific problem. Compare the presented model to previously published models.
+
+Item 29. Indicate the uncertainty of the performance metrics’ values, such as with standard deviation and/or confidence intervals. Compute appropriate tests of statistical significance to compare metrics. Specify the statistical software.
+
+Item 30. Analyze the robustness or sensitivity of the model to various assumptions or initial conditions.
+
+Item 31. If applied, describe the methods that allow one to explain or interpret the model’s results and provide the parameters used to generate them (14). Describe how any such methods were validated in the current study.
+
+Item 32. Describe the data used to evaluate performance of the completed algorithm. When these data are not drawn from a different data source than the training data, note and justify this limitation. If there are differences in structure of annotations or data between the training set and evaluation set, explain the differences, and describe and justify the approach taken to accommodate the differences.
+
+Item 33. Specify the criteria to include and exclude patients or examinations or pieces of information and document the numbers of cases that met each criterion. We strongly recommend including a flowchart/diagram in your results to show initial patient population and those excluded for any reason. Describe the summary of the technical characteristics of the dataset. For example, for images: modality vendors/models, acquisition parameters, reformat parameters; for reports: practice setting, number and training of report authors, extent of structured reporting.
+
+Item 34. Demographic and clinical characteristics of cases in each partition should be specified. State the performance metrics on all data partitions.
+
+Item 35. Report the final model’s performance on the test partition. Benchmark the performance of the AI model against current standards, such as histopathologic identification of disease or a panel of medical experts with an explicit method to resolve disagreements.
+
+Item 36. For classification tasks, include estimates of diagnostic accuracy and their precision, such as 95\% confidence intervals (2). Apply appropriate methodology such as receiver operating characteristic analysis and/or calibration curves. When the direct calculation of confidence intervals is not possible, report nonparametric estimates from bootstrap samples (11). State which variables were shown to be predictive of the response variable. Identify the subpopulation(s) for which the prediction model worked most and least effectively (11).
+
+Item 37. Provide information to help understand incorrect results. If the task entails classification into two or more categories, provide a confusion matrix that shows tallies for predicted versus actual categories. Consider presenting examples of incorrectly classified cases to help readers better understand the strengths and limitations of the algorithm.
+
+Item 38. Summarize the results succinctly and place them into context; explain how the current work advances our knowledge and the state of the art. Identify the study’s limitations, including those involving the study’s methods, materials, biases, statistical uncertainty, unexpected results, and generalizability.
+
+Item 39. Describe the implications for practice, including the intended use and possible clinical role of the AI model. Describe the key impact the work may have on the field. Envision the next steps that one might take to build upon the results. Discuss any issues that would impede successful translation of the model into practice.
+
+Item 40. Comply with the clinical trial registration statement from the International Committee of Medical Journal Editors (ICMJE). ICMJE recommends that all medical journal editors require registration of clinical trials in a public trials registry at or before the time of first patient enrollment as a condition of consideration for publication (30). Registration of the study protocol in a clinical trial registry, such as ClinicalTrials.gov or WHO Primary Registries, helps avoid overlapping or redundant studies and allows interested parties to contact the study coordinators (5).
+
+Item 41. State where readers can access the full study protocol if it exceeds the journal’s word limit; this information can help readers evaluate the validity of the study and can help researchers who want to replicate the study (5). Describe the algorithms and software in sufficient detail to allow replication of the study. Authors should deposit all computer code used for modeling and/or data analysis into a publicly accessible repository.
+
+Item 42. Specify the sources of funding and other support and the exact role of the funders in performing the study. Indicate whether the authors had independence in each phase of the study”
+\newpage
+
+\section{CLAIM evaluation scores by study metadata}
+\label{app:scatterplot}
+\vspace{-0.5cm}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{images/6MetadataresultsAll.png}
+    \caption{Relationship between overall CLAIM evaluation scores and selected study metadata, stratified by evaluator.}
+    \label{fig:Metadata}
+\end{figure}

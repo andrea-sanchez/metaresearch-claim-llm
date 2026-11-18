@@ -1,0 +1,6 @@
+outcome,n,chi2,p_value,p_adj,significant
+study_description_domain,60,16.5758,0.000251547,0.000503095,True
+dataset_description_domain,60,25.9295,2.34141e-06,9.36564e-06,True
+model_description_domain,60,20.7857,3.06506e-05,9.19519e-05,True
+performance_domain,60,5.92627,0.0516568,0.0516568,False
+all_domains,60,32.6667,8.0635e-08,4.03175e-07,True

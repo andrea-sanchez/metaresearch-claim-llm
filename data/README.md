@@ -65,12 +65,4 @@ Score = #Yes / (#Yes + #No); `Not applicable` and missing ratings are excluded.
 
 ## Known issues
 
-- `paper_id = 35` appears twice (*Curiale*, *Curialea*): two table rows sharing
-  one reference. The comparison uses *Curiale* (`HUMAN_ENTRY_FOR_DUPLICATES`).
-- Missing ratings: paper 40 / ChatGPT / `q10`; paper 46 / Gemini / `q17`.
-- All Model description items rated `Not applicable` for paper 56 / Claude: the item-level
-  score is undefined; the original database records 0 (used in the analysis).
-- Paper 57 / Gemini / Model description: the original database records 0; items give 2/3.
 - One rating spelled `Notapplicabble` (paper 59 / Claude); normalized in code.
-- Paper 11: the source sheet had the note "Se tardó un montón en dar respuesta"
-  in the *Humans* row (not attributable to a specific LLM).

@@ -74,4 +74,4 @@ from the item-level computation (`src/analysis.py::SPREADSHEET_OVERRIDES`):
 
 ## Authors
 
-Alicia Ramos, Andrea Sánchez, Mireia Brichs, Yolanda Romero — Universitat Pompeu Fabra
+Alicia Ramos, Andrea Sánchez, Mireia Brichs, Yolanda Romero @ Universitat Pompeu Fabra

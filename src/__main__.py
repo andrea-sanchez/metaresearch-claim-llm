@@ -1,5 +1,5 @@
 """
-Run the full pipeline: data → scores → statistics → tables → figures.
+Run the full pipeline: raw data -> processed tables -> statistics -> tables -> figures.
 
     python -m src
 """
@@ -22,23 +22,18 @@ def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s | %(message)s")
 
     # 1. Data
-    full = D.load_full_dataset()
-    D.PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
-    full.to_csv(D.PROCESSED_DIR / "full_dataset.csv", index=False)
-    D.build_reduced_dataset(full).to_csv(D.PROCESSED_DIR / "reduced_dataset.csv", index=False)
-
-    scores = A.prepare_scores(full)
-    scores.to_csv(D.PROCESSED_DIR / "scores.csv", index=False)
+    full, scores = D.write_processed()
 
     # 2. Statistics and tables
     results = A.run_analysis(scores)
     TABLES_DIR.mkdir(parents=True, exist_ok=True)
-    for name, df in results.items():
-        df.to_csv(TABLES_DIR / f"{name}.csv", index=False, float_format="%.6g")
+    for name, table in results.items():
+        table.to_csv(TABLES_DIR / f"{name}.csv", index=False, float_format="%.6g")
     (TABLES_DIR / "agreement.tex").write_text(A.agreement_to_latex(results["agreement"]))
     (TABLES_DIR / "friedman.tex").write_text(
         A.friedman_to_latex(results["friedman"], results["pairwise"]))
     log.info("Tables -> %s", TABLES_DIR)
+    log.info("Summary\n%s", A.summary(results))
 
     # 3. Figures
     F.make_all(scores, full, results, IMAGES_DIR)

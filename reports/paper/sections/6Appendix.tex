@@ -1,4 +1,119 @@
-\appendix{}
+\appendix
+\section{Items and domains}
+\label{app:table}
+
+\begin{longtable}{|p{2cm}|c|p{7.2cm}|p{2.8cm}|}
+\hline
+\textbf{Section} & \textbf{No.} & \textbf{Criteria} & \textbf{Domain} \\
+\hline
+\endfirsthead
+\hline
+\textbf{Section} & \textbf{No.} & \textbf{Criteria} & \textbf{Domain} \\
+\hline
+\endhead
+\hline
+\endfoot
+\footnotesize
+\multirow{1}{=}{\textbf{Title}}
+ & 1 & Identification as a study of AI methodology, specifying the category of technology used (e.g., deep learning) & Study description \\
+\hline
+\multirow{1}{=}{\textbf{Abstract}}
+ & 2 & Structured summary of study design, methods, results, and conclusions & Study description \\
+\hline
+\multirow{2}{=}{\textbf{Introduction}}
+ & 3 & Scientific and clinical background, including the intended use and clinical role of the AI approach & Study description \\
+\cline{2-4}
+ & 4 & Study objectives and hypotheses & Study description \\
+\hline
+\multirow{2}{=}{\textbf{Study design}}
+ & 5 & Prospective or retrospective study & Study description \\
+\cline{2-4}
+ & 6 & Study goal, such as model creation, exploratory study, feasibility study, non-inferiority trial & Study description \\
+\hline
+\multirow{7}{=}{\textbf{Data sources}}
+ & 7 & Data sources & Dataset description \\
+\cline{2-4}
+ & 8 & Eligibility criteria: how, where, and when potentially eligible participants or studies were identified (e.g., symptoms, results from previous tests, inclusion in registry, patient-care setting, location, dates) & Dataset description \\
+\cline{2-4}
+ & 9 & Data pre-processing steps & Dataset description \\
+\cline{2-4}
+ & 10 & Selection of data subsets, if applicable & Dataset description \\
+\cline{2-4}
+ & 11 & Definitions of data elements, with references to Common Data Elements & Dataset description \\
+\cline{2-4}
+ & 12 & De-identification methods & Dataset description \\
+\cline{2-4}
+ & 13 & How missing data were handled & Dataset description \\
+\hline
+\multirow{5}{=}{\textbf{Ground truth reference standard}}
+ & 14 & Definition of ground truth reference standard, in sufficient detail to allow replication & Dataset description \\
+\cline{2-4}
+ & 15 & Rationale for choosing the reference standard (if alternatives exist) & Dataset description \\
+\cline{2-4}
+ & 16 & Source of ground-truth annotations; qualifications and preparation of annotators & Dataset description \\
+\cline{2-4}
+ & 17 & Annotation tools & Dataset description \\
+\cline{2-4}
+ & 18 & Measurement of inter- and intrarater variability; methods to mitigate variability and/or resolve discrepancies & Dataset description \\
+\hline
+\multirow{3}{=}{\textbf{Data partitions}}
+ & 19 & Intended sample size and how it was determined & Dataset description \\
+\cline{2-4}
+ & 20 & How data were assigned to partitions; specify proportions & Dataset description \\
+\cline{2-4}
+ & 21 & Level at which partitions are disjoint (e.g., image, study, patient, institution) & Dataset description \\
+\hline
+\multirow{3}{=}{\textbf{Model}}
+ & 22 & Detailed description of model, including inputs, outputs, all intermediate layers and connections & Model description \\
+\cline{2-4}
+ & 23 & Software libraries, frameworks, and packages & Model description \\
+\cline{2-4}
+ & 24 & Initialization of model parameters (e.g., randomization, transfer learning) & Model description \\
+\hline
+\multirow{3}{=}{\textbf{Training}}
+ & 25 & Details of training approach, including data augmentation, hyperparameters, number of models trained & Model description \\
+\cline{2-4}
+ & 26 & Method of selecting the final model & Model description \\
+\cline{2-4}
+ & 27 & Ensembling techniques, if applicable & Model description \\
+\hline
+\multirow{5}{=}{\textbf{Evaluation}}
+ & 28 & Metrics of model performance & Model performance \\
+\cline{2-4}
+ & 29 & Statistical measures of significance and uncertainty (e.g., confidence intervals) & Model performance \\
+\cline{2-4}
+ & 30 & Robustness or sensitivity analysis & Model performance \\
+\cline{2-4}
+ & 31 & Methods for explainability or interpretability (e.g., saliency maps), and how they were validated & Model performance \\
+\cline{2-4}
+ & 32 & Validation or testing on external data & Model performance \\
+\hline
+\multirow{2}{=}{\textbf{Data}}
+ & 33 & Flow of participants or cases, using a diagram to indicate inclusion and exclusion & Dataset description \\
+\cline{2-4}
+ & 34 & Demographic and clinical characteristics of cases in each partition & Dataset description \\
+\hline
+\multirow{3}{=}{\textbf{Model performance}}
+ & 35 & Performance metrics for optimal model(s) on all data partitions & Model performance \\
+\cline{2-4}
+ & 36 & Estimates of diagnostic accuracy and their precision (such as 95\% confidence intervals) & Model performance \\
+\cline{2-4}
+ & 37 & Failure analysis of incorrectly classified cases & Model performance \\
+\hline
+\multirow{2}{=}{\textbf{Discussion}}
+ & 38 & Study limitations, including potential bias, statistical uncertainty, and generalizability & Model performance \\
+\cline{2-4}
+ & 39 & Implications for practice, including the intended use and/or clinical role & Model performance \\
+\hline
+\multirow{3}{=}{\textbf{Other information}}
+ & 40 & Registration number and name of registry & Study description \\
+\cline{2-4}
+ & 41 & Where the full study protocol can be accessed & Study description \\
+\cline{2-4}
+ & 42 & Sources of funding and other support; role of funders & Study description \\
+\end{longtable}
+
+\newpage
 \section{Prompt used for LLM CLAIM evaluation}
 \label{app:prompt}
 “Act as an experienced scientific peer reviewer with expertise in artificial intelligence (AI) and medical imaging research. Your task is to critically assess the attached scientific manuscript using the 2020 version of the Checklist for Artificial Intelligence in Medical Imaging (CLAIM). Your assessment must reflect the judgment and rigor of an independent human reviewer.
@@ -133,7 +248,7 @@ Item 42. Specify the sources of funding and other support and the exact role of 
 \vspace{-0.5cm}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{images/6MetadataresultsAll.png}
+    \includegraphics[width=1\linewidth]{images/figC1_scores_by_metadata.png}
     \caption{Relationship between overall CLAIM evaluation scores and selected study metadata, stratified by evaluator.}
     \label{fig:Metadata}
 \end{figure}

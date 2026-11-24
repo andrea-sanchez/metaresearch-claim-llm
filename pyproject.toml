@@ -1,3 +1,8 @@
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
+filterwarnings = [
+    # deprecations raised inside seaborn, not in this code
+    "ignore::DeprecationWarning:seaborn",
+    "ignore::PendingDeprecationWarning:seaborn",
+]

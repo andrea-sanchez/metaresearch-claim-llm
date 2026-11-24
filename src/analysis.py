@@ -1,230 +1,202 @@
 """
-Statistical analysis: LLM vs. human CLAIM compliance scores.
+Statistical analysis: LLM vs. human CLAIM compliance scores (Methods, Section 2.2).
 
-Reproduces the tables and statistics of ``reports/paper``:
+    agreement           MAE, ME and Wilcoxon signed-rank test vs. humans,
+                        Holm over 15 tests                                   -> Table 1
+    model_differences   Friedman test on absolute errors (Holm over 5 outcomes)
+                        and pairwise Wilcoxon tests (Holm within outcome)    -> Table 2
+    correlations        Spearman rho LLM-humans and LLM-LLM, Holm per family -> Fig. 3
+    descriptives        mean, SD and quartiles per evaluator and outcome     -> Section 3
 
-    descriptives   mean / quartiles per evaluator and outcome
-    agreement      MAE, ME, Wilcoxon signed-rank vs. humans, Holm (15 tests)   → Table 1
-    friedman       Friedman on absolute errors, Holm (5 tests)                 → Table 2
-    pairwise       Wilcoxon on paired absolute errors, Holm within outcome     → Table 2
-    spearman       ρ LLM–human and LLM–LLM, Holm per family (15 + 15)          → Figure 3
-
-Score preparation (Methodology, §2):
-    - compliance score = #Yes / (#Yes + #No) × 100
-    - every score rounded to a whole-number percentage (half up)
-    - error = LLM − human, in percentage points
-    - domain scores taken as in the source spreadsheet (SPREADSHEET_OVERRIDES)
-
-NOTE — PLACEHOLDER IMPLEMENTATION
-    Reconstructed from the paper and validated against its reported numbers.
-    To be replaced by the original analysis code.
+Input: tidy score table from ``src.data.prepare_scores`` with columns
+``paper_id, evaluator, outcome, score`` (score in whole-number percent).
 """
 
 from __future__ import annotations
 
-import itertools
-from dataclasses import dataclass
+from itertools import combinations
 
 import numpy as np
 import pandas as pd
 from scipy.stats import friedmanchisquare, spearmanr, wilcoxon
+from statsmodels.stats.multitest import multipletests
 
 from src import data as D
 
-LLMS = ["ChatGPT", "Claude", "Gemini"]  # order used in the paper's tables
-HUMANS = D.HUMAN_EVALUATOR
+REFERENCE = D.HUMAN_EVALUATOR
+LLMS = ["ChatGPT", "Claude", "Gemini"]  # order used in the paper
+EVALUATORS = [REFERENCE, *LLMS]
 OUTCOMES = D.SCORE_COLS
 OUTCOME_LABELS = {
     "study_description_domain": "Study description",
     "dataset_description_domain": "Dataset description",
     "model_description_domain": "Model description",
-    "performance_domain": "Performance",
-    "all_domains": "Results",  # overall score
+    "performance_domain": "Model performance",
+    "all_domains": "Overall",
 }
 ALPHA = 0.05
-
-
-@dataclass(frozen=True)
-class Override:
-    paper_id: int
-    evaluator: str
-    outcome: str
-    value: float
-    reason: str
-
-
-# Domain scores taken as recorded in the original database (source spreadsheet).
-# Always applied.
-SPREADSHEET_OVERRIDES = [
-    Override(57, "Gemini", "model_description_domain", 0.0,
-             "value recorded in the original database"),
-    Override(56, "Claude", "model_description_domain", 0.0,
-             "all items 'Not applicable' (#DIV/0! in the spreadsheet) scored as 0"),
-]
+CORRECTION = "holm"
 
 
 # ---------------------------------------------------------------------------
-# Score preparation
+# Helpers
 # ---------------------------------------------------------------------------
-
-
-def to_percent(x: pd.Series | pd.DataFrame):
-    """Fraction → whole-number percentage, rounding half up (as Excel ROUND).
-
-    The intermediate ``round(…, 6)`` removes floating-point noise
-    (e.g. 0.58 × 100 = 57.999…) before rounding.
-    """
-    return np.floor(np.round(x * 100, 6) + 0.5)
-
-
-def prepare_scores(full: pd.DataFrame) -> pd.DataFrame:
-    """Long table: paper_id, evaluator, outcome, score (integer %),
-    with SPREADSHEET_OVERRIDES applied."""
-    full = full.copy()
-    for o in SPREADSHEET_OVERRIDES:
-        mask = (full["paper_id"] == o.paper_id) & (full["evaluator"] == o.evaluator)
-        assert mask.sum() == 1, o
-        full.loc[mask, o.outcome] = o.value
-    long = full.melt(
-        id_vars=["paper_id", "evaluator"], value_vars=OUTCOMES,
-        var_name="outcome", value_name="score",
-    )
-    long["score"] = to_percent(long["score"])
-    return long
 
 
 def wide(scores: pd.DataFrame, outcome: str) -> pd.DataFrame:
-    """papers × evaluators matrix for one outcome."""
+    """Papers x evaluators score matrix for one outcome."""
     w = scores[scores["outcome"] == outcome].pivot(
         index="paper_id", columns="evaluator", values="score"
     )
-    return w[[HUMANS, *LLMS]]
+    return w[EVALUATORS]
+
+
+def adjust(pvalues) -> np.ndarray:
+    """Multiple-comparison adjustment (Holm)."""
+    return multipletests(pvalues, method=CORRECTION)[1]
 
 
 # ---------------------------------------------------------------------------
-# Statistics helpers
+# Agreement (MAE) and strictness (ME + Wilcoxon)
 # ---------------------------------------------------------------------------
-
-
-def holm(pvalues) -> np.ndarray:
-    """Holm–Bonferroni adjusted p-values (step-down, monotone)."""
-    p = np.asarray(pvalues, dtype=float)
-    order = np.argsort(p)
-    m = len(p)
-    adjusted = np.empty(m)
-    running = 0.0
-    for rank, idx in enumerate(order):
-        running = max(running, (m - rank) * p[idx])
-        adjusted[idx] = min(1.0, running)
-    return adjusted
-
-
-def _paired(a: pd.Series, b: pd.Series) -> tuple[pd.Series, pd.Series]:
-    ok = a.notna() & b.notna()
-    return a[ok], b[ok]
-
-
-def _wilcoxon(a: pd.Series, b: pd.Series) -> float:
-    """Two-sided Wilcoxon signed-rank; zero differences excluded ('wilcox')."""
-    a, b = _paired(a, b)
-    return wilcoxon(a, b, zero_method="wilcox", alternative="two-sided").pvalue
-
-
-# ---------------------------------------------------------------------------
-# Analyses
-# ---------------------------------------------------------------------------
-
-
-def descriptives(scores: pd.DataFrame) -> pd.DataFrame:
-    """Mean, SD and quartiles per evaluator and outcome."""
-    g = scores.groupby(["outcome", "evaluator"])["score"]
-    out = pd.DataFrame({
-        "n": g.count(), "mean": g.mean(), "sd": g.std(),
-        "q1": g.quantile(0.25), "median": g.median(), "q3": g.quantile(0.75),
-        "min": g.min(), "max": g.max(),
-    }).reset_index()
-    return _order(out)
 
 
 def agreement(scores: pd.DataFrame) -> pd.DataFrame:
-    """MAE, ME and Wilcoxon (LLM vs. humans); Holm over all 15 tests."""
+    """MAE, ME and two-sided Wilcoxon signed-rank test of LLM - human
+    differences (zero differences excluded); Holm over all 15 tests."""
     rows = []
     for outcome in OUTCOMES:
         w = wide(scores, outcome)
         for model in LLMS:
-            llm, hum = _paired(w[model], w[HUMANS])
-            err = llm - hum
+            diff = (w[model] - w[REFERENCE]).dropna()
+            p = wilcoxon(diff, zero_method="wilcox").pvalue if diff.any() else 1.0
             rows.append({
-                "outcome": outcome, "model": model, "n": len(err),
-                "mae": err.abs().mean(), "me": err.mean(),
-                "p_value": _wilcoxon(llm, hum),
+                "outcome": outcome, "model": model, "n": len(diff),
+                "mae": diff.abs().mean(), "me": diff.mean(), "p_value": p,
             })
     df = pd.DataFrame(rows)
-    df["p_adj"] = holm(df["p_value"])
-    df["direction"] = np.where(df["me"] < 0, "Stricter", "More lenient")
+    df["p_adj"] = adjust(df["p_value"])
+    df["significant"] = df["p_adj"] < ALPHA
+    df["direction"] = np.select(
+        [df["me"] < 0, df["me"] > 0], ["Stricter", "More lenient"], default="No bias"
+    )
+    return df
+
+
+def ranking(agreement_df: pd.DataFrame, outcome: str = "all_domains") -> pd.DataFrame:
+    """Models ranked by MAE (rank 1 = closest to humans) for one outcome."""
+    rank = (agreement_df.loc[agreement_df["outcome"] == outcome, ["model", "mae"]]
+            .sort_values("mae").reset_index(drop=True))
+    rank.insert(0, "rank", range(1, len(rank) + 1))
+    return rank
+
+
+# ---------------------------------------------------------------------------
+# Differences between models
+# ---------------------------------------------------------------------------
+
+
+def model_differences(scores: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Friedman test on the absolute errors of the LLMs (papers as blocks;
+    Holm over outcomes) and pairwise Wilcoxon tests on the paired absolute
+    errors (Holm within each outcome)."""
+    friedman_rows, pairwise_rows = [], []
+    for outcome in OUTCOMES:
+        w = wide(scores, outcome)
+        abs_err = w[LLMS].sub(w[REFERENCE], axis=0).abs().dropna()
+
+        chi2, p = friedmanchisquare(*(abs_err[m] for m in LLMS))
+        friedman_rows.append({"outcome": outcome, "n": len(abs_err), "chi2": chi2, "p_value": p})
+
+        pairs = list(combinations(LLMS, 2))
+        pvals = [wilcoxon(abs_err[a], abs_err[b], zero_method="wilcox").pvalue for a, b in pairs]
+        for (a, b), p_raw, p_adj in zip(pairs, pvals, adjust(pvals)):
+            mae_a, mae_b = abs_err[a].mean(), abs_err[b].mean()
+            pairwise_rows.append({
+                "outcome": outcome, "model_a": a, "model_b": b, "n": len(abs_err),
+                "mae_a": mae_a, "mae_b": mae_b, "p_value": p_raw, "p_adj": p_adj,
+                "significant": p_adj < ALPHA,
+                "closer_to_humans": a if mae_a < mae_b else b if mae_b < mae_a else "Equal",
+            })
+
+    friedman = pd.DataFrame(friedman_rows)
+    friedman["p_adj"] = adjust(friedman["p_value"])
+    friedman["significant"] = friedman["p_adj"] < ALPHA
+    return friedman, pd.DataFrame(pairwise_rows)
+
+
+# ---------------------------------------------------------------------------
+# Rank correlation
+# ---------------------------------------------------------------------------
+
+
+def correlations(scores: pd.DataFrame, reference: str | None = REFERENCE) -> pd.DataFrame:
+    """Spearman rho per outcome (average ranks for ties).
+
+    With ``reference``: each LLM vs the reference; with ``None``: every pair
+    of LLMs. Holm correction over the whole family (15 tests).
+    """
+    pairs = [(m, reference) for m in LLMS] if reference else list(combinations(LLMS, 2))
+    rows = []
+    for outcome in OUTCOMES:
+        w = wide(scores, outcome)
+        for a, b in pairs:
+            pair = w[[a, b]].dropna()
+            rho, p = spearmanr(pair[a], pair[b])
+            rows.append({"outcome": outcome, "pair": f"{a} vs {b}", "n": len(pair),
+                         "rho": rho, "p_value": p})
+    df = pd.DataFrame(rows)
+    df["p_adj"] = adjust(df["p_value"])
     df["significant"] = df["p_adj"] < ALPHA
     return df
 
 
-def model_differences(scores: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Friedman test on absolute errors (Holm over 5 outcomes) and pairwise
-    Wilcoxon on absolute errors (Holm within each outcome)."""
-    fr_rows, pw_rows = [], []
-    for outcome in OUTCOMES:
-        w = wide(scores, outcome)
-        abs_err = w[LLMS].sub(w[HUMANS], axis=0).abs().dropna()
-        stat, p = friedmanchisquare(*(abs_err[m] for m in LLMS))
-        fr_rows.append({"outcome": outcome, "n": len(abs_err), "chi2": stat, "p_value": p})
-
-        pairs = list(itertools.combinations(LLMS, 2))
-        pvals = [_wilcoxon(abs_err[a], abs_err[b]) for a, b in pairs]
-        for (a, b), p_raw, p_adj in zip(pairs, pvals, holm(pvals)):
-            closer = a if abs_err[a].mean() < abs_err[b].mean() else b
-            pw_rows.append({
-                "outcome": outcome, "model_a": a, "model_b": b, "n": len(abs_err),
-                "mae_a": abs_err[a].mean(), "mae_b": abs_err[b].mean(),
-                "p_value": p_raw, "p_adj": p_adj, "significant": p_adj < ALPHA,
-                "closer_to_humans": closer,
-            })
-    friedman = pd.DataFrame(fr_rows)
-    friedman["p_adj"] = holm(friedman["p_value"])
-    friedman["significant"] = friedman["p_adj"] < ALPHA
-    return friedman, pd.DataFrame(pw_rows)
+# ---------------------------------------------------------------------------
+# Descriptive statistics
+# ---------------------------------------------------------------------------
 
 
-def spearman(scores: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """ρ LLM–humans and LLM–LLM; Holm applied separately to each family."""
-    def corr(a, b):
-        a, b = _paired(a, b)
-        r = spearmanr(a, b)
-        return r.statistic, r.pvalue
-
-    vs_h, vs_llm = [], []
-    for outcome in OUTCOMES:
-        w = wide(scores, outcome)
-        for m in LLMS:
-            rho, p = corr(w[m], w[HUMANS])
-            vs_h.append({"outcome": outcome, "pair": f"{m} vs Humans", "rho": rho, "p_value": p})
-        for a, b in itertools.combinations(LLMS, 2):
-            rho, p = corr(w[a], w[b])
-            vs_llm.append({"outcome": outcome, "pair": f"{a} vs {b}", "rho": rho, "p_value": p})
-    out = []
-    for rows in (vs_h, vs_llm):
-        df = pd.DataFrame(rows)
-        df["p_adj"] = holm(df["p_value"])
-        df["significant"] = df["p_adj"] < ALPHA
-        out.append(df)
-    return out[0], out[1]
-
-
-def _order(df: pd.DataFrame) -> pd.DataFrame:
-    df["outcome"] = pd.Categorical(df["outcome"], OUTCOMES, ordered=True)
-    return df.sort_values(list(df.columns[:2])).reset_index(drop=True)
+def descriptives(scores: pd.DataFrame) -> pd.DataFrame:
+    """Mean, SD and quartiles per outcome and evaluator."""
+    g = scores.groupby(["outcome", "evaluator"])["score"]
+    out = g.describe().rename(columns={"25%": "q1", "50%": "median", "75%": "q3"}).reset_index()
+    out["outcome"] = pd.Categorical(out["outcome"], OUTCOMES, ordered=True)
+    out["evaluator"] = pd.Categorical(out["evaluator"], EVALUATORS, ordered=True)
+    return out.sort_values(["outcome", "evaluator"]).reset_index(drop=True)
 
 
 # ---------------------------------------------------------------------------
-# LaTeX export (same layout as the paper)
+# Orchestration and reporting
 # ---------------------------------------------------------------------------
+
+
+def run_analysis(scores: pd.DataFrame) -> dict[str, pd.DataFrame]:
+    """Every statistic reported in the paper."""
+    friedman, pairwise = model_differences(scores)
+    return {
+        "descriptives": descriptives(scores),
+        "agreement": agreement(scores),
+        "friedman": friedman,
+        "pairwise": pairwise,
+        "spearman_llm_humans": correlations(scores, reference=REFERENCE),
+        "spearman_llm_llm": correlations(scores, reference=None),
+    }
+
+
+def summary(results: dict[str, pd.DataFrame]) -> str:
+    """Key numbers of the paper, one per line."""
+    agr, fr = results["agreement"], results["friedman"]
+    rho_h, rho_llm = results["spearman_llm_humans"], results["spearman_llm_llm"]
+    return "\n".join([
+        f"Agreement   MAE {agr['mae'].min():.1f}-{agr['mae'].max():.1f} pp",
+        f"Strictness  {(agr['me'] < 0).sum()}/{len(agr)} stricter, "
+        f"{agr['significant'].sum()}/{len(agr)} significant biases",
+        f"Models      differ in {fr['significant'].sum()}/{len(fr)} outcomes (Friedman)",
+        f"Spearman    LLM-humans {rho_h['rho'].min():.2f} to {rho_h['rho'].max():.2f} "
+        f"({rho_h['significant'].sum()}/{len(rho_h)} significant); "
+        f"LLM-LLM {rho_llm['rho'].min():.2f} to {rho_llm['rho'].max():.2f} "
+        f"({rho_llm['significant'].sum()}/{len(rho_llm)} significant)",
+    ])
 
 
 def _sci(p: float) -> str:
@@ -233,18 +205,17 @@ def _sci(p: float) -> str:
 
 
 def agreement_to_latex(df: pd.DataFrame) -> str:
+    """Tabular of Table 1."""
     lines = [
         r"\begin{tabular}{llrrrrl}", r"\hline",
         r"\textbf{Target} & \textbf{Model} & \textbf{MAE} & \textbf{ME} & "
         r"\textbf{Wilcoxon p} & \textbf{Adjusted p} & \textbf{Direction} \\",
         r"\hline",
     ]
-    n_max = df["n"].max()
-    for outcome, g in df.groupby("outcome", sort=False):
-        for _, r in g.iterrows():
-            model = r.model + ("$^{a}$" if r.n < n_max else "")  # reduced n, see note
+    for _, g in df.groupby("outcome", sort=False):
+        for r in g.itertuples():
             lines.append(
-                f"{OUTCOME_LABELS[outcome]} & {model} & {r.mae:.3f} & {r.me:.3f} & "
+                f"{OUTCOME_LABELS[r.outcome]} & {r.model} & {r.mae:.3f} & {r.me:.3f} & "
                 f"{_sci(r.p_value)} & {_sci(r.p_adj)} & {r.direction} \\\\"
             )
         lines.append(r"\hline")
@@ -253,41 +224,22 @@ def agreement_to_latex(df: pd.DataFrame) -> str:
 
 
 def friedman_to_latex(friedman: pd.DataFrame, pairwise: pd.DataFrame) -> str:
+    """Tabular of Table 2 (model closer to humans in bold)."""
     lines = [
         r"\begin{tabular}{lccc}", r"\hline",
         r"\textbf{Domain} & \textbf{Friedman $\chi^2$} & \textbf{Adjusted p} & "
         r"\textbf{Significant pairwise comparisons} \\",
         r"\hline",
     ]
-    for _, r in friedman.iterrows():
-        sig = pairwise[(pairwise.outcome == r.outcome) & pairwise.significant]
+    for r in friedman.itertuples():
+        sig = pairwise[(pairwise["outcome"] == r.outcome) & pairwise["significant"]]
         pairs = [
             " vs ".join(f"\\textbf{{{m}}}" if m == s.closer_to_humans else m
                         for m in (s.model_a, s.model_b))
-            for _, s in sig.iterrows()
+            for s in sig.itertuples()
         ]
         p = "$<0.001$" if r.p_adj < 0.001 else f"{r.p_adj:.3f}"
-        lines.append(
-            f"{OUTCOME_LABELS[r.outcome]} & {r.chi2:.2f} & {p} & "
-            f"{', '.join(pairs) or 'None'} \\\\"
-        )
+        lines.append(f"{OUTCOME_LABELS[r.outcome]} & {r.chi2:.2f} & {p} & "
+                     f"{', '.join(pairs) or 'None'} \\\\")
     lines += [r"\hline", r"\end{tabular}"]
     return "\n".join(lines) + "\n"
-
-
-# ---------------------------------------------------------------------------
-# Orchestration
-# ---------------------------------------------------------------------------
-
-
-def run_analysis(scores: pd.DataFrame) -> dict[str, pd.DataFrame]:
-    friedman, pairwise = model_differences(scores)
-    rho_h, rho_llm = spearman(scores)
-    return {
-        "descriptives": descriptives(scores),
-        "agreement": agreement(scores),
-        "friedman": friedman,
-        "pairwise": pairwise,
-        "spearman_llm_humans": rho_h,
-        "spearman_llm_llm": rho_llm,
-    }

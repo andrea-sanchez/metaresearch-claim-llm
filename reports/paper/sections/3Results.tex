@@ -1,31 +1,33 @@
 \section{Results}
-To begin, an overall overview of the results was conducted. In Figure \ref{fig:Scorespaper}, the paper-level score comparison revealed substantial variability across individual studies, with the differences between human and LLMs evaluations varying considerably from one paper to another, rather than following a consistent pattern.
+First, a general inspection of the results was carried out. Paper-level score comparisons (Figure \ref{fig:Scorespaper}) revealed substantial variability in the magnitude of differences between human and LLM evaluations across individual studies. However, the direction of this difference was largely consistent, with LLMs generally assigning lower scores than human assessors.
+
+
 \vspace{-0.5cm}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\linewidth]{images/35ScoresResults2.png}
+    \includegraphics[width=0.8\linewidth]{images/fig1_overall_scores_per_paper.png}
     \caption{Comparison of CLAIM overall scores assigned by humans and LLMs.}
     \label{fig:Scorespaper}
 \end{figure}
 \vspace{-0.5cm}
 \noindent
-The boxplots in Figure \ref{fig:scoreDistribution} showed  the majority of human evaluations were between 62-77\%. The three LLMs gave lower and more dispersed scores for the majority of the observations: ChatGPT had a range of 28–41\%, Gemini of 38–61\% and Claude of 38–59\%. 
+The boxplots (Figure \ref{fig:scoreDistribution}) showed that most human evaluation scores were concentrated between 62\% and 77\%. All three LLMs assigned lower scores overall. The interquartile ranges were 28–41\% for ChatGPT, 38–61\% for Gemini and 38–59\% for Claude. Compared with human evaluations, Gemini and Claude showed greater variability, whereas ChatGPT showed a slightly narrower interquartile range. 
 
-As it can be seen in bar plots in Figure \ref{fig:scoreDomain}, human evaluators gave the highest mean compliance to Model description (87.00\%) and the lowest to Dataset description (61.70\%). LLMs had their lowest-scored domain in Model description, for ChatGPT (19.17\%) and Claude (29.63\%); Gemini was the exception (57.42\%). In contrast, Performance became the highest-scored domain for all three LLMs (67.98-77.47\%), exceeding the human score (64.00\%). 
+The bar plots (Figure \ref{fig:scoreDomain}) showed that human evaluators gave the highest mean compliance to Model description (87.00\%) and the lowest to Dataset description (61.70\%). LLMs had their lowest-scored domain in Model description, for ChatGPT (19.17\%) and Claude (29.63\%), Gemini was the exception (57.42\%). In contrast, “Model performance” became the highest-scored domain for all three LLMs (67.98-77.47\%), exceeding the human score (64.00\%).  
 \vspace{-0.5cm}
 \begin{figure}[H]
     \centering
     \captionsetup[subfigure]{font=scriptsize}
     \begin{subfigure}{0.38\linewidth}
         \centering
-        \includegraphics[height=3cm]{images/4ScoresDistribution2.png}
+        \includegraphics[height=3cm]{images/fig2a_overall_score_distribution.png}
         \caption{}
         \label{fig:scoreDistribution}
     \end{subfigure}
     \hfill
     \begin{subfigure}{0.52\linewidth}
         \centering
-        \includegraphics[height=3cm]{images/5ScoresDomain2.png}
+        \includegraphics[height=3cm]{images/fig2b_mean_score_by_domain.png}
         \caption{}
         \label{fig:scoreDomain}
     \end{subfigure}
@@ -34,10 +36,11 @@ As it can be seen in bar plots in Figure \ref{fig:scoreDomain}, human evaluators
 \end{figure}
 \vspace{-0.5cm}
 \noindent
-Additionally, evaluation scores were also examined across study metadata variables, ranging from ~10\% to 90\% with unequal sample sizes per category (Appendix \ref{app:scatterplot}). Across all variables, human scores remained consistently clustered at higher values, whereas LLM scores showed wider dispersion and variable overlap. 
+Additionally, evaluation scores were also examined across study metadata variables, ranging from 10\% to 90\% with unequal sample sizes per category (Appendix \ref{app:scatterplot}). Across all variables, human scores remained consistently clustered at higher values, whereas LLM scores showed wider dispersion and variable overlap. 
 
 \subsection{Agreement and strictness of LLMs compared to human evaluations}
-As it can be seen in Table \ref{tab:mae_wilcoxon}, in three of the four CLAIM domains, all LLMs were significantly stricter than human reviewers (ME: $-18.6$ to $-67.8$ pp), with the largest discrepancies in Model description (MAE: 68.5, 61.9, and 42.5 for ChatGPT, Claude, and Gemini, respectively). Claude showed the lowest MAE in Results (21.7), whereas ChatGPT showed the highest (33.13). In Performance, Claude and Gemini were significantly more lenient (ME = 13.5 and 9.9 pp), while ChatGPT showed no significance (ME = 4.0 pp). Overall, 12 of 15 model domain comparisons showed negative bias, and 14 of 15 biases were statistically significant after multiple-comparison correction.
+As shown in Table \ref{tab:mae_wilcoxon}, in three of the four CLAIM domains, all LLMs were significantly stricter than human assessors (ME: -20.8 to -67.8 percentage points), with the largest discrepancies observed in the “Model description” domain (MAE: 68.5, 61.9 and 42.5 for ChatGPT, Claude and Gemini, respectively). In Overall score, Claude showed the lowest MAE (21.7), whereas ChatGPT showed the highest (33.13). In contrast, in the “Model performance” domain, Claude and Gemini were significantly more lenient (ME: 13.5 and 9.9 percentage points, respectively), while ChatGPT showed no statistically significant difference (ME: 4.0 percentage points). Overall, 12 of the 15 model-domain comparisons showed negative bias, and 14 of the 15 biases were statistically significant after correction for multiple comparisons.
+
 \vspace{-0.5cm}
 \begin{table}[H]
 \centering
@@ -64,13 +67,13 @@ Model description & ChatGPT & 68.500 & -67.833 & $6.44 \times 10^{-11}$ & $7.73 
 Model description & Claude  & 61.900 & -57.367 & $5.26 \times 10^{-10}$ & $5.79 \times 10^{-9}$ & Stricter \\
 Model description & Gemini  & 42.483 & -29.583 & $1.38 \times 10^{-5}$  & $5.53 \times 10^{-5}$ & Stricter \\
 \hline
-Performance & ChatGPT & 20.517 & 3.983 & $2.18 \times 10^{-1}$ & $2.18 \times 10^{-1}$ & More lenient \\
-Performance & Claude  & 25.300 & 13.467 & $8.11 \times 10^{-4}$ & $2.43 \times 10^{-3}$ & More lenient \\
-Performance & Gemini  & 22.200 & 9.900 & $4.84 \times 10^{-3}$ & $9.69 \times 10^{-3}$ & More lenient \\
+Model performance & ChatGPT & 20.517 & 3.983 & $2.18 \times 10^{-1}$ & $2.18 \times 10^{-1}$ & More lenient \\
+Model performance & Claude  & 25.300 & 13.467 & $8.11 \times 10^{-4}$ & $2.43 \times 10^{-3}$ & More lenient \\
+Model performance & Gemini  & 22.200 & 9.900 & $4.84 \times 10^{-3}$ & $9.69 \times 10^{-3}$ & More lenient \\
 \hline
-Results & ChatGPT & 33.133 & -33.100 & $2.50 \times 10^{-11}$ & $3.50 \times 10^{-10}$ & Stricter \\
-Results & Claude  & 21.700 & -18.633 & $2.64 \times 10^{-8}$  & $2.37 \times 10^{-7}$ & Stricter \\
-Results & Gemini  & 24.850 & -19.317 & $2.18 \times 10^{-7}$  & $1.09 \times 10^{-6}$ & Stricter \\
+Overall & ChatGPT & 33.133 & -33.100 & $2.50 \times 10^{-11}$ & $3.50 \times 10^{-10}$ & Stricter \\
+Overall & Claude  & 21.700 & -18.633 & $2.64 \times 10^{-8}$  & $2.37 \times 10^{-7}$ & Stricter \\
+Overall & Gemini  & 24.850 & -19.317 & $2.18 \times 10^{-7}$  & $1.09 \times 10^{-6}$ & Stricter \\
 \hline
 \end{tabular}
 }
@@ -78,11 +81,12 @@ Results & Gemini  & 24.850 & -19.317 & $2.18 \times 10^{-7}$  & $1.09 \times 10^
 \vspace{-0.5cm}
 
 \subsection{Model differences}
-Friedman test results from Table \ref{tab:freidman} revealed significant differences between LLMs in three of the four domains and in the overall score (all adjusted p < 0.001), with no significant difference in Performance (adjusted p = 0.052). Pairwise comparisons showed that Claude was significantly closer to human assessments than ChatGPT in Study description, Dataset description, and Results; and closer than Gemini in Dataset description. Gemini was closer to humans than both ChatGPT and Claude in Model description and closer than ChatGPT in Results. 
+The Friedman test (Table \ref{tab:freidman}) identified significant differences between LLMs in the overall score and in three of the four CLAIM domains (all adjusted p < 0.001). No significant differences were found in the "Model performance” domain (adjusted p = 0.052). Pairwise comparisons showed that Claude was significantly closer to human assessments than ChatGPT in the “Study description”, “Dataset description” domains and Overall, and closer than Gemini in “Dataset description”. Gemini, in turn, was closer to human assessments than both ChatGPT and Claude in “Model description”, and closer than ChatGPT in Overall.
+ 
 \vspace{-0.5cm}
 \begin{table}[H]
 \centering
-\caption{Friedman test results comparing LLM scores across CLAIM domains.}
+\caption{Friedman test results comparing the absolute errors of the LLMs across CLAIM domains.}
 \label{tab:freidman}
 \begin{tabular}{lccc}
 \hline
@@ -91,8 +95,8 @@ Friedman test results from Table \ref{tab:freidman} revealed significant differe
 Study description   & 16.58 & $<0.001$ & ChatGPT vs \textbf{Claude} \\
 Dataset description & 25.93 & $<0.001$ & ChatGPT vs \textbf{Claude}, \textbf{Claude} vs Gemini\\
 Model description   & 20.79 & $<0.001$ & ChatGPT vs \textbf{Gemini}, Claude vs \textbf{Gemini} \\
-Performance         & 5.93  & 0.052    & None  \\
-Results             & 32.67 & $<0.001$ & ChatGPT vs \textbf{Claude}, ChatGPT vs \textbf{Gemini}\\
+Model performance         & 5.93  & 0.052    & None  \\
+Overall             & 32.67 & $<0.001$ & ChatGPT vs \textbf{Claude}, ChatGPT vs \textbf{Gemini}\\
 \hline
 \end{tabular}
 \begin{minipage}{\textwidth}
@@ -101,13 +105,13 @@ Results             & 32.67 & $<0.001$ & ChatGPT vs \textbf{Claude}, ChatGPT vs 
 \end{minipage}
 \end{table}
 \subsection{Rank correlation}
-Spearman correlations of Figure \ref{fig:Spearman} showed no significant association between any LLM and the human evaluations in any CLAIM domain ($(\rho)$ between -0.29 and 0.02), indicating that the LLMs did not rank papers in the same order as human reviewers. The weakest correlations were observed for Dataset description (Gemini, $(\rho)$ = -0.29) and Results (Gemini, $(\rho)$ = -0.27). 
+Spearman correlation analyses (Figure \ref{fig:Spearman}) revealed no significant associations between any LLM and human assessments across the CLAIM domains ($\rho$ ranging from -0.29 to 0.02). This indicates that the LLMs did not consistently rank papers in the same order as human assessors. The strongest negative correlations were observed for Gemini in “Dataset description” ($\rho$= -0.29) and Overall ($\rho$ = -0.27), whereas the weakest associations were found in the “Model performance” domain ($\rho$ = 0.01 and 0.02).
 
-In contrast, agreement among LLMs was higher, with 6 of the 15 pairwise correlations being significant after multiple-testing adjustment. It was strongest between ChatGPT and Claude in Study description ($(\rho)$ = 0.65), Dataset description ($(\rho)$ = 0.62) and Results ($(\rho)$ = 0.54), while Model description showed the lowest agreement ($(\rho)$ = 0.13-0.33, none significant). 
+In contrast, correlations between LLMs were generally higher, with 6 of the 15 pairwise comparisons remaining significant after adjustment for multiple testing. The strongest associations were observed between ChatGPT and Claude in the “Study description” ($\rho$ = 0.65), “Dataset description” ($\rho$ = 0.62) domains and Overall ($\rho$ = 0.54). By comparison, agreement was lowest in the “Model description” domain, where correlations ranged from 0.13 to 0.33, with none reaching statistical significance.
 \vspace{-0.5cm}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\linewidth]{images/2Spearmanrho.png}
+    \includegraphics[width=0.9\linewidth]{images/fig3_spearman_heatmaps.png}
     \caption{Spearman correlation coefficients across CLAIM domains for (a) LLM and human assessments and (b) pairs of LLMs.}
     \label{fig:Spearman}
 \end{figure}
